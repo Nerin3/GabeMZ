@@ -1,6 +1,7 @@
 //============================================================================
 // Gabe MZ - Step Sound
 //----------------------------------------------------------------------------
+// 23/09/22 | Version: 1.2.0 | Added Ignore Steps
 // 23/10/20 | Version: 1.1.1 | Followers step sound bug fix
 // 07/09/20 | Version: 1.1.0 | Included new sound control parameters
 // 28/08/20 | Version: 1.0.0 | Released
@@ -10,8 +11,8 @@
 
 /*:
  * @target MZ
- * @plugindesc [v1.1.1] Allows characters to emit step sounds when walking.
- * @author Gabe (Gabriel Nascimento)
+ * @plugindesc [v1.2.0] Allows characters to emit step sounds when walking.
+ * @author Creator: Gabe (Gabriel Nascimento). Edited by Nerine
  * @url https://github.com/comuns-rpgmaker/GabeMZ
  * 
  * @help Gabe MZ - Step Sound
@@ -117,6 +118,14 @@
  * @default 90
  * @min 0
  * @max 100
+ * 
+ * @param divisionFrequency
+ * @text Ignore Steps
+ * @desc Set the steps sound frequency by ignoring n-amount of steps. Setting this to > 1 will override other frequencies
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 20
  * 
  * @command playerStepSound
  * @text Player Step Sound
@@ -236,6 +245,8 @@ GabeMZ.StepSound.VERSION = [1, 1, 1];
     GabeMZ.StepSound.followersStepSound = JSON.parse(params.followersStepSound);
     GabeMZ.StepSound.walkingFrequency = JSON.parse(params.walkingFrequency);
     GabeMZ.StepSound.dashingFrequency = JSON.parse(params.dashingFrequency);
+    GabeMZ.StepSound.divisionFrequency = JSON.parse(params.divisionFrequency);
+    let counter = 0;
 
     //-----------------------------------------------------------------------------
     // PluginManager
@@ -272,22 +283,27 @@ GabeMZ.StepSound.VERSION = [1, 1, 1];
     Game_CharacterBase.prototype.increaseSteps = function() {
         _Game_CharacterBase_increaseSteps.call(this)
         const frequency = this.isDashing() ? GabeMZ.StepSound.dashingFrequency : GabeMZ.StepSound.walkingFrequency;
-        if ((Math.floor(Math.random() * 100)) > frequency) return;
-        const settings = this.stepSound();
-        if (this.stepSoundEmittance() && settings && this.isNearTheScreen()) {
-            let variance = Math.floor(Math.random() * parseInt(settings.variance)) + 1;
-            let name = parseInt(settings.variance) == 1 ? `${settings.baseName}` : `${settings.baseName + variance}`;
-            let volume = parseInt(settings.volume) + (Math.floor(Math.random() * parseInt(settings.volumeVariance)));
-            let pitch = parseInt(settings.pitch) + (Math.floor(Math.random() * parseInt(settings.pitchVariance)));
-            let pan = parseInt(settings.pan) + (Math.floor(Math.random() * parseInt(settings.panVariance)));
-            let se = {
-                name: name,
-                volume: volume,
-                pitch: pitch,
-                pan: pan
+        const division = this.isDashing() ? GabeMZ.StepSound.divisionFrequency : GabeMZ.StepSound.divisionFrequency + 1;
+        if (division == (1 - this.isDashing()) && (Math.floor(Math.random() * 100)) > frequency) return;
+        counter++;
+        if (division <= counter) {
+            counter = 0;
+            const settings = this.stepSound();
+            if (this.stepSoundEmittance() && settings && this.isNearTheScreen()) {
+                let variance = Math.floor(Math.random() * parseInt(settings.variance)) + 1;
+                let name = parseInt(settings.variance) == 1 ? `${settings.baseName}` : `${settings.baseName + variance}`;
+                let volume = parseInt(settings.volume) + (Math.floor(Math.random() * parseInt(settings.volumeVariance)));
+                let pitch = parseInt(settings.pitch) + (Math.floor(Math.random() * parseInt(settings.pitchVariance)));
+                let pan = parseInt(settings.pan) + (Math.floor(Math.random() * parseInt(settings.panVariance)));
+                let se = {
+                    name: name,
+                    volume: volume,
+                    pitch: pitch,
+                    pan: pan
+                }
+                AudioManager.playSe(se);
             }
-            AudioManager.playSe(se);
-        }
+        } else return;
     };
 
     Game_CharacterBase.prototype.stepSound = function() {
