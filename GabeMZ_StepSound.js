@@ -121,7 +121,7 @@
  * 
  * @param divisionFrequency
  * @text Ignore Steps
- * @desc Set the steps sound frequency by ignoring n-amount of steps. Setting this to > 1 will override other frequencies
+ * @desc Set the steps sound frequency by playing sound every n-amount of steps. Setting this to > 0 will override other frequencies.
  * @type number
  * @default 1
  * @min 1
