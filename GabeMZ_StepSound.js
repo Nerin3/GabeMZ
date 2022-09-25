@@ -288,7 +288,6 @@ GabeMZ.StepSound.VERSION = [1, 1, 1];
         const settings = this.stepSound();
         if (this.stepSoundEmittance() && settings && this.isNearTheScreen()) {
             counter++;
-            console.log(counter);
             if (division <= counter) {
                 counter = 0;
             } else return;
