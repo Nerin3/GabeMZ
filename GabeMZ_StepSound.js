@@ -13,7 +13,7 @@
  * @target MZ
  * @plugindesc [v1.2.0] Allows characters to emit step sounds when walking.
  * @author Creator: Gabe (Gabriel Nascimento). Edited by Nerine
- * @url https://github.com/comuns-rpgmaker/GabeMZ
+ * @url https://github.com/Nerin3/GabeMZ
  * 
  * @help Gabe MZ - Step Sound
  *  - This plugin is released under the zlib License.
@@ -283,27 +283,28 @@ GabeMZ.StepSound.VERSION = [1, 1, 1];
     Game_CharacterBase.prototype.increaseSteps = function() {
         _Game_CharacterBase_increaseSteps.call(this)
         const frequency = this.isDashing() ? GabeMZ.StepSound.dashingFrequency : GabeMZ.StepSound.walkingFrequency;
-        const division = this.isDashing() ? GabeMZ.StepSound.divisionFrequency : GabeMZ.StepSound.divisionFrequency + 1;
-        if (division == (1 - this.isDashing()) && (Math.floor(Math.random() * 100)) > frequency) return;
-        counter++;
-        if (division <= counter) {
-            counter = 0;
-            const settings = this.stepSound();
-            if (this.stepSoundEmittance() && settings && this.isNearTheScreen()) {
-                let variance = Math.floor(Math.random() * parseInt(settings.variance)) + 1;
-                let name = parseInt(settings.variance) == 1 ? `${settings.baseName}` : `${settings.baseName + variance}`;
-                let volume = parseInt(settings.volume) + (Math.floor(Math.random() * parseInt(settings.volumeVariance)));
-                let pitch = parseInt(settings.pitch) + (Math.floor(Math.random() * parseInt(settings.pitchVariance)));
-                let pan = parseInt(settings.pan) + (Math.floor(Math.random() * parseInt(settings.panVariance)));
-                let se = {
-                    name: name,
-                    volume: volume,
-                    pitch: pitch,
-                    pan: pan
-                }
-                AudioManager.playSe(se);
+        const division = GabeMZ.StepSound.divisionFrequency;
+        if (division == 1 && (Math.floor(Math.random() * 100)) > frequency) return;
+        const settings = this.stepSound();
+        if (this.stepSoundEmittance() && settings && this.isNearTheScreen()) {
+            counter++;
+            console.log(counter);
+            if (division <= counter) {
+                counter = 0;
+            } else return;
+            let variance = Math.floor(Math.random() * parseInt(settings.variance)) + 1;
+            let name = parseInt(settings.variance) == 1 ? `${settings.baseName}` : `${settings.baseName + variance}`;
+            let volume = parseInt(settings.volume) + (Math.floor(Math.random() * parseInt(settings.volumeVariance)));
+            let pitch = parseInt(settings.pitch) + (Math.floor(Math.random() * parseInt(settings.pitchVariance)));
+            let pan = parseInt(settings.pan) + (Math.floor(Math.random() * parseInt(settings.panVariance)));
+            let se = {
+                name: name,
+                volume: volume,
+                pitch: pitch,
+                pan: pan
             }
-        } else return;
+            AudioManager.playSe(se);
+        }
     };
 
     Game_CharacterBase.prototype.stepSound = function() {
